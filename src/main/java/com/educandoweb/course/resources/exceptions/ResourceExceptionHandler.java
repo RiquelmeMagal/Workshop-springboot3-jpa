@@ -1,5 +1,6 @@
 package com.educandoweb.course.resources.exceptions;
 
+import com.educandoweb.course.services.exceptions.DatabaseException;
 import com.educandoweb.course.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @ControllerAdvice
-public class ExceptionHandler implements Serializable {
+public class ResourceExceptionHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @org.springframework.web.bind.annotation.ExceptionHandler(ResourceNotFoundException.class)
@@ -21,4 +22,11 @@ public class ExceptionHandler implements Serializable {
         return ResponseEntity.status(status).body(err);
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<StandardError> resourceNotFound(DatabaseException e, HttpServletRequest request) {
+        String error = "Database error";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }
